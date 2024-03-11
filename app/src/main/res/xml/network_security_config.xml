@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- Allow connections to weather.visualcrossing.com -->
+        <domain includeSubdomains="true">weather.visualcrossing.com</domain>
+    </domain-config>
+</network-security-config>
