@@ -29,7 +29,6 @@ public class HttpRequester {
     }
 
     class Workertasks implements Runnable {
-
         @Override
         public void run() {
             int responseCode = 0;
@@ -52,8 +51,6 @@ public class HttpRequester {
             }
         }
     }
-
-
     public  void UpdateUI() {
         //this method sholud be overided in imlementation in another class and do the ui updates accordingly
         Log.d(TAG, "UpdateUI: " + response);

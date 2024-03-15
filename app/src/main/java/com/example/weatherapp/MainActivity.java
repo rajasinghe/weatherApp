@@ -33,7 +33,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 
 public class MainActivity extends AppCompatActivity {
-    String TAG="main activity";
+    String TAG = "main activity";
     LocalDate currentDate;
     ArrayList<Location> locations;
     ListView listView;
@@ -50,47 +50,45 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        handler=new Handler(Looper.getMainLooper());
+        handler = new Handler(Looper.getMainLooper());
         currentDate = LocalDate.now();
-        hourlyForecastRecycler=findViewById(R.id.hourly_forecaset);
+        hourlyForecastRecycler = findViewById(R.id.hourly_forecaset);
         hourlyForecastRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                if (newState==RecyclerView.SCROLL_STATE_IDLE){
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             scrollToPositionOfHourlyRecycler(LocalTime.now().getHour());
                         }
-                    },5000);
+                    }, 5000);
                 }
             }
         });
 
-        locations=new ArrayList<Location>();
+        locations = new ArrayList<Location>();
         getData("6.4738,79.9920");
 
-        addLocationBtn=findViewById(R.id.addCity);
+        addLocationBtn = findViewById(R.id.addCity);
         addLocationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent go_to_addLocation_activity=new Intent(getBaseContext(),AddLocationsActivity.class);
+                Intent go_to_addLocation_activity = new Intent(getBaseContext(), AddLocationsActivity.class);
                 startActivity(go_to_addLocation_activity);
             }
         });
     }
 
     public void getData(String location) {
-
-
-        Log.d(TAG, "getData: "+currentDate.toString());
+        Log.d(TAG, "getData: " + currentDate.toString());
         String today = currentDate.toString();
-        LocalDate futureDate=currentDate.plusDays(5);
-        Log.d(TAG, "getData: "+futureDate.toString());
-        String lastDate=futureDate.toString();
+        LocalDate futureDate = currentDate.plusDays(5);
+        Log.d(TAG, "getData: " + futureDate.toString());
+        String lastDate = futureDate.toString();
 
-        HttpRequester requester = new HttpRequester(location,today,lastDate) {
+        HttpRequester requester = new HttpRequester(location, today, lastDate) {
             @Override
             public void UpdateUI() {
                 super.UpdateUI();
@@ -99,12 +97,12 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject jsonObject = new JSONObject(this.response);
                     JSONArray days = jsonObject.getJSONArray("days");
                     //creating the array list of days
-                    ArrayList<Day> dayslist=new ArrayList<Day>();
+                    ArrayList<Day> dayslist = new ArrayList<Day>();
                     for (int i = 0; i < days.length(); i++) {
                         //creating the arraylist of hours
                         JSONObject jsonDay = days.getJSONObject(i);
                         JSONArray jsonHours = jsonDay.getJSONArray("hours");
-                        ArrayList<Hour> hoursList=new ArrayList<Hour>();
+                        ArrayList<Hour> hoursList = new ArrayList<Hour>();
                         for (int j = 0; j < jsonHours.length(); j++) {
                             JSONObject jsonHour = jsonHours.getJSONObject(j);
                             //creating hour object there will be 24 hour objects for each day object
@@ -119,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                             hoursList.add(hour);
                         }
                         //creating the days object there will be much objects as specified in the request and each day object has 24 hour objects
-                        Day day=new Day(
+                        Day day = new Day(
                                 hoursList,
                                 jsonDay.getString("datetime"),
                                 jsonDay.getDouble("tempmax"),
@@ -132,37 +130,37 @@ public class MainActivity extends AppCompatActivity {
                         dayslist.add(day);
                     }
                     //creating the location object each location object will have much days objects as specified in the query they will be as a arraylist of days objects;
-                    location1=new Location("beruwala",location,dayslist);
+                    location1 = new Location("beruwala", location, dayslist);
                     MainActivity.this.locations.add(location1);
 
                 } catch (JSONException e) {
-                    Log.e("jsonerror", "UpdateUI: "+e );
+                    Log.e("jsonerror", "UpdateUI: " + e);
                 }
 
                 runOnUiThread(new Runnable() {
                     @SuppressLint("SetTextI18n")
                     @Override
                     public void run() {
-                            HourlyForecastRecyclerAdapter adapter=new HourlyForecastRecyclerAdapter(locations.get(0).getDays().get(0).getHours());
-                            hourlyForecastRecycler.setAdapter(adapter);
-                            hourlyForecastRecycler.post(() -> {
+                        HourlyForecastRecyclerAdapter adapter = new HourlyForecastRecyclerAdapter(locations.get(0).getDays().get(0).getHours());
+                        hourlyForecastRecycler.setAdapter(adapter);
+                        hourlyForecastRecycler.post(() -> {
                             LinearLayoutManager layoutManager = (LinearLayoutManager) hourlyForecastRecycler.getLayoutManager();
                             if (layoutManager != null) {
                                 layoutManager.scrollToPositionWithOffset(LocalTime.now().getHour(), 0);
                             }
 
                         });
-                        Log.d(TAG, "run: "+locations.get(0).getDays().get(0).getDate());
-                          TextView t=findViewById(R.id.description);
-                         t.setText(locations.get(0).getDays().get(0).getDescription());
-                          t=findViewById(R.id.tempHour);
-                          t.setText(locations.get(0).getDays().get(0).getHours().get(LocalTime.now().getHour()).getTemp()+"°C");
-                          t=findViewById(R.id.maxTemp);
-                          t.setText(locations.get(0).getDays().get(0).getTempMax()+"°C");
-                          t=findViewById(R.id.minTemp);
-                          t.setText(locations.get(0).getDays().get(0).getTempMin()+"°C");
-                          t=findViewById(R.id.iconDesc);
-                          t.setText(locations.get(0).getDays().get(0).getHours().get(LocalTime.now().getHour()).getCloudIcon());
+                        Log.d(TAG, "run: " + locations.get(0).getDays().get(0).getDate());
+                        TextView t = findViewById(R.id.description);
+                        t.setText(locations.get(0).getDays().get(0).getDescription());
+                        t = findViewById(R.id.tempHour);
+                        t.setText(locations.get(0).getDays().get(0).getHours().get(LocalTime.now().getHour()).getTemp() + "°C");
+                        t = findViewById(R.id.maxTemp);
+                        t.setText(locations.get(0).getDays().get(0).getTempMax() + "°C");
+                        t = findViewById(R.id.minTemp);
+                        t.setText(locations.get(0).getDays().get(0).getTempMin() + "°C");
+                        t = findViewById(R.id.iconDesc);
+                        t.setText(locations.get(0).getDays().get(0).getHours().get(LocalTime.now().getHour()).getCloudIcon());
                     }
                 });
 
@@ -170,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
-    public void scrollToPositionOfHourlyRecycler(int position){
-            hourlyForecastRecycler.smoothScrollToPosition(position);
+    public void scrollToPositionOfHourlyRecycler(int position) {
+        hourlyForecastRecycler.smoothScrollToPosition(position);
     }
 }
